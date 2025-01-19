@@ -1,0 +1,104 @@
+version: "3.7"
+
+
+# 方式一：使用 x- 扩展字段
+x-node-name:
+  alice: &relay-alice "relay-alice"
+  bob: &relay-bob "relay-bob"
+  asset-hub-alice: &asset-hub-alice "asset-hub-alice"
+  asset-hub-bob: &asset-hub-bob "asset-hub-bob"
+
+services:
+  # validator1
+  relay-alice:
+    container_name: *relay-alice
+    image: parity/polkadot:${VERSION:?"Must set `VERSION` in .env"}
+    user: "${UID}:${GID}"
+    ports:
+      - "9944:9944"    # RPC
+      - "30333:30333"  # P2P
+    volumes:
+      - ${GENESIS_OUTPUT_DIR}:/genesis
+      - ${DATA_DIR}/${relay-alice}:/data/
+    command: >
+      --validator
+      --alice
+      --chain=/genesis/${RELAY_CHAIN_SEPC}.json
+      --node-key-file=/genesis/relaychain-bootnode.key
+      --base-path=/data
+      --pruning=archive
+      --rpc-methods=unsafe
+      --rpc-external
+      --rpc-cors=all
+      --name=${relay-alice}
+
+  # validator2
+  relay-bob:
+    container_name: *relay-bob
+    image: parity/polkadot:${VERSION:?"Must set `VERSION` in .env"}
+    user: "${UID}:${GID}"
+    ports:
+      - "9945:9944"    # RPC
+      - "30334:30333"  # P2P
+    volumes:
+      - ${GENESIS_OUTPUT_DIR}:/genesis
+      - ${DATA_DIR}/${relay-bob}:/data/
+    command: >
+      --validator
+      --bob
+      --chain=/genesis/${RELAY_CHAIN_SEPC}.json
+      --unsafe-force-node-key-generation
+      --base-path=/data
+      --pruning=archive
+      --rpc-methods=unsafe
+      --rpc-external
+      --rpc-cors=all
+      --name=${relay-bob}
+
+  # parachain
+  asset-hub-alice:
+    container_name: *asset-hub-alice
+    image: parity/polkadot-parachain:${VERSION:?"Must set `VERSION` in .env"}
+    user: "${UID}:${GID}"
+    ports:
+      - "19944:9944"    # RPC
+      - "31333:30333"  # P2P
+    volumes:
+      - ${GENESIS_OUTPUT_DIR}:/genesis
+      - ${DATA_DIR}/${asset-hub-alice}:/data/
+    command: >
+      --alice
+      --chain=/genesis/${ASSET_HUB_CHAIN_SEPC}.json
+      --node-key-file=/genesis/asset-hub-bootnode.key
+      --base-path=/data
+      --pruning=archive
+      --rpc-methods=unsafe
+      --rpc-external
+      --rpc-cors=all
+      --name=${asset-hub-alice}
+      --
+      --chain=/genesis/${RELAY_CHAIN_SEPC}.json
+
+  # parachain
+  asset-hub-bob:
+    container_name: *asset-hub-bob
+    image: parity/polkadot-parachain:${VERSION:?"Must set `VERSION` in .env"}
+    user: "${UID}:${GID}"
+    ports:
+      - "19945:9944"    # RPC
+      - "31334:30333"  # P2P
+    volumes:
+      - ${GENESIS_OUTPUT_DIR}:/genesis
+      - ${DATA_DIR}/${asset-hub-bob}:/data/
+    command: >
+      --bob
+      --chain=/genesis/${ASSET_HUB_CHAIN_SEPC}.json
+      --unsafe-force-node-key-generation
+      --base-path=/data
+      --pruning=archive
+      --rpc-methods=unsafe
+      --rpc-external
+      --rpc-cors=all
+      --name=${asset-hub-bob}
+      --
+      --chain=/genesis/${RELAY_CHAIN_SEPC}.json

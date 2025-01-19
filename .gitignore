@@ -1,0 +1,8 @@
+.env
+
+# genesis output
+genesis/*
+!genesis/.gitkeep
+
+data/*
+!data/.gitkeep
