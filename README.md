@@ -81,8 +81,6 @@ This script will:
 - Create chain specifications
 - Export genesis state and WASM for the parachain
 
-````
-
 ### 3. Running the Local Networks
 Run local networks with the following command:
 ```bash
