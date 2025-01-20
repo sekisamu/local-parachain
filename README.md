@@ -119,7 +119,7 @@ parachain: 127.0.0.1:19944
 ```
 
 Open the asset-hub page, and you will see that the parachain is not producing blocks at this moment:
-![asset-hub-not-producing-blocks](./images/asset-hub-pending.png)
+![asset-hub-not-producing-blocks](./images/aset-hub-network-pending.png)
 
 At this point, switch to the Relaychain's Polkadot.js page. Navigate to the Developer -> Sudo page and execute the paraSudoWrapper::sudoScheduleParaInitialized method to onboard the asset-hub parachain.
 Note that the parachain ID for the asset-hub is 1000. Then, select the state and wasm files under genesis, upload them, and execute the transaction:
